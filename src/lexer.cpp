@@ -1,6 +1,10 @@
 #include "lexer.h"
 // #include "tokens.h"
 
+Lexer::Lexer(string s){
+    source=s;
+}
+
 bool Lexer::is_at_end(){
     return current>=source.size();
 }
@@ -41,13 +45,14 @@ void Lexer::handle_string(){
     while(peek()!='"'){
         s+=advance();
     }
-    // advance()
+    advance();
     add_token(TokenType::STRING,s,line);
     return ;
 }
 
 void Lexer::handle_number(){
     string s="";
+    current--;
     while(isdigit(peek())){
         s+=advance();
     }
@@ -57,6 +62,7 @@ void Lexer::handle_number(){
 
 void Lexer::handle_identifier(){
     string s="";
+    current--;
     while(isalnum(peek())){
         s+=advance();
     }
@@ -85,28 +91,28 @@ void Lexer::handle_identifier(){
     if(s=="if"){
         add_token(TokenType::IF, s, line);
     }
-    if(s=="else"){
+    else if(s=="else"){
         add_token(TokenType::ELSE, s, line);
     }
-    if(s=="for"){
+    else if(s=="for"){
         add_token(TokenType::FOR, s, line);
     }
-    if(s=="while"){
+    else if(s=="while"){
         add_token(TokenType::WHILE, s, line);
     }
     // if(s=="not"){
     //     add_token(TokenType::NOT, s, line);
     // }
-    if(s=="print"){
+    else if(s=="print"){
         add_token(TokenType::PRINT, s, line);
     }
-    if(s=="return"){
+    else if(s=="return"){
         add_token(TokenType::RETURN, s, line);
     }
-    if(s=="TRUE"){
+    else if(s=="TRUE"){
         add_token(TokenType::TRUE, s, line);
     }
-    if(s=="FALSE"){
+    else if(s=="FALSE"){
         add_token(TokenType::FALSE, s, line);
     }
     else{
