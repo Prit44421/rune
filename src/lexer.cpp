@@ -28,9 +28,8 @@ char Lexer::peek_next(){
 }
 
 bool Lexer::match(char expected){
-    if(!is_at_end()) return false;
-    char x=peek();
-    if(x) return x==expected;
+    if(is_at_end()) return false;
+    if(peek()==expected) return true;
     return false;
 }
     
@@ -53,7 +52,7 @@ void Lexer::handle_string(){
 void Lexer::handle_number(){
     string s="";
     current--;
-    while(isdigit(peek())){
+    while(isdigit(peek()) || peek()=='.'){
         s+=advance();
     }
     add_token(TokenType::NUMBER, s, line);
@@ -159,6 +158,7 @@ void Lexer::scan_token(){
             break;
         case '=':
             if(match('=')){
+                current++;
                 add_token(TokenType::EQUAL_EQUAL,"==",line);
             }
             else{
@@ -167,6 +167,7 @@ void Lexer::scan_token(){
             break;
         case '!':
             if(match('=')){
+                current++;
                 add_token(TokenType::NOT_EQUAL,"!=",line);
             }
             else{
@@ -175,6 +176,7 @@ void Lexer::scan_token(){
             break;
         case '<':
             if(match('=')){
+                current++;
                 add_token(TokenType::LESS_EQUAL,"<=",line);
             }
             else{
@@ -183,6 +185,7 @@ void Lexer::scan_token(){
             break;
         case '>':
             if(match('=')){
+                current++;
                 add_token(TokenType::GREATER_EQUAL,">=",line);
             }
             else{
