@@ -3,7 +3,7 @@
 #include <sstream>
 
 #include "lexer.h"
-
+#include "ast.h"
 
 using namespace std;
 
