@@ -16,6 +16,8 @@ enum class TokenType {
 
     NUMBER, STRING, IDENTIFIER,
 
+    AND, OR, COMMA, DEF, LET,NIL,
+
     END_OF_FILE
 };
 

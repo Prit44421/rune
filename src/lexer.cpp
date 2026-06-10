@@ -156,6 +156,9 @@ void Lexer::scan_token(){
         case '}':
             add_token(TokenType::RIGHT_PAREN_CURLY, "}", line);
             break;
+        case ';':
+            add_token(TokenType::SEMICOLON, ";", line);
+            break;
         case '=':
             if(match('=')){
                 current++;

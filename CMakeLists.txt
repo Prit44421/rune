@@ -6,5 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(rune
     src/main.cpp
     src/lexer.cpp
+    src/parser.cpp
 )
 target_include_directories(rune PRIVATE src/)

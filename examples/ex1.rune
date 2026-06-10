@@ -2,3 +2,5 @@ num = 6.98;
 if(num==6.98){
     print(TRUE);
 }
+
+print(hello);

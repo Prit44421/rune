@@ -19,8 +19,7 @@ struct AssignExpr;
 struct LogicalExpr; // todo
 struct CallExpr;    // todo
 
-struct ExprVisitor
-{
+struct ExprVisitor{
     ~ExprVisitor() = default;
     virtual Value visit_literal(Literal &expr) = 0;
     virtual Value visit_binary(BinaryExpr &expr) = 0;
@@ -28,17 +27,16 @@ struct ExprVisitor
     virtual Value visit_group(GroupExpr &expr) = 0;
     virtual Value visit_var(VarExpr &expr) = 0;
     virtual Value visit_assign(AssignExpr &expr) = 0;
+    virtual Value visit_logical(LogicalExpr &expr) = 0;
 };
 
-struct Expr
-{
+struct Expr{
     ~Expr() = default;
 
     virtual Value accept(ExprVisitor &visitor) = 0;
 };
 
-struct Literal : Expr
-{
+struct Literal : Expr{
     Value val;
     Literal(Value v)
     {
@@ -49,8 +47,7 @@ struct Literal : Expr
     }
 };
 
-struct BinaryExpr : Expr
-{
+struct BinaryExpr : Expr{
     unique_ptr<Expr> left;
     unique_ptr<Expr> right;
     Token o;
@@ -65,8 +62,7 @@ struct BinaryExpr : Expr
     }
 };
 
-struct UnaryExpr : Expr
-{
+struct UnaryExpr : Expr{
     Token o;
     unique_ptr<Expr> num;
 
@@ -79,8 +75,7 @@ struct UnaryExpr : Expr
     }
 };
 
-struct GroupExpr : Expr
-{
+struct GroupExpr : Expr{
 
     unique_ptr<Expr> exp;
     GroupExpr(unique_ptr<Expr> e)
@@ -93,8 +88,7 @@ struct GroupExpr : Expr
     }
 };
 
-struct VarExpr : Expr
-{
+struct VarExpr : Expr{
 
     Token name;
 
@@ -107,8 +101,7 @@ struct VarExpr : Expr
     }
 };
 
-struct AssignExpr : Expr
-{
+struct AssignExpr : Expr{
 
     Token name;
     unique_ptr<Expr> exp;
@@ -124,6 +117,22 @@ struct AssignExpr : Expr
     }
 };
 
+struct LogicalExpr : Expr{
+    unique_ptr<Expr> left;
+    TokenType op;
+    unique_ptr<Expr> right;
+
+    LogicalExpr(unique_ptr<Expr> l, TokenType o, unique_ptr<Expr> r):
+        left(move(l)),
+        op(o),
+        right(move(r))
+    {}
+
+    Value accept(ExprVisitor &visitor) override{
+        return visitor.visit_logical(*this);
+    }
+};
+
 struct ExprStmt;
 struct PrintStmt;
 struct VarDeclStmt;
@@ -133,8 +142,7 @@ struct WhileStmt;
 struct FunDeclStmt;
 struct ReturnStmt;
 
-struct StmtVisitor
-{
+struct StmtVisitor{
     virtual ~StmtVisitor() = default;
     virtual void visit_expr_stmt(ExprStmt &stmt) = 0;
     virtual void visit_print(PrintStmt &stmt) = 0;
@@ -149,6 +157,16 @@ struct StmtVisitor
 struct Stmt{
     virtual ~Stmt() = default;
     virtual void accept(StmtVisitor &visitor) = 0;
+};
+
+struct ExprStmt : Stmt{
+    unique_ptr<Expr> expression;
+    ExprStmt(unique_ptr<Expr> e){
+        expression = move(e);
+    }
+    void accept(StmtVisitor &visitor) override{
+        visitor.visit_expr_stmt(*this);
+    }
 };
 
 struct PrintStmt : Stmt{
@@ -173,57 +191,47 @@ struct VarDeclStmt : Stmt{
     }
 };
 
-struct ExprStmt : Stmt
-{
-    unique_ptr<Expr> expression;
-    ExprStmt(unique_ptr<Expr> e)
-    {
-        expression = move(e);
+struct BlockStmt : Stmt{
+    vector<unique_ptr<Stmt>> statements;
+    BlockStmt(vector<unique_ptr<Stmt>> s){
+        statements = move(s);
     }
-    void accept(StmtVisitor &visitor) override
-    {
-        visitor.visit_expr_stmt(*this);
+    void accept(StmtVisitor &visitor) override{
+        visitor.visit_block(*this);
     }
 };
 
-struct IfStmt : Stmt
-{
+struct IfStmt : Stmt{
     unique_ptr<Expr> condition;
     unique_ptr<Stmt> then_branch;
     unique_ptr<Stmt> else_branch;
 
-    IfStmt(unique_ptr<Expr> cond, unique_ptr<Stmt> then_b, unique_ptr<Stmt> else_b)
-    {
+    IfStmt(unique_ptr<Expr> cond, unique_ptr<Stmt> then_b, unique_ptr<Stmt> else_b){
         condition = move(cond);
         then_branch = move(then_b);
         else_branch = move(else_b);
     }
 
-    void accept(StmtVisitor &visitor) override
-    {
+    void accept(StmtVisitor &visitor) override{
         visitor.visit_if(*this);
     }
 };
 
-struct WhileStmt : Stmt
-{
+struct WhileStmt : Stmt{
     unique_ptr<Expr> condition;
     unique_ptr<Stmt> body;
 
-    WhileStmt(unique_ptr<Expr> cond, unique_ptr<Stmt> b)
-    {
+    WhileStmt(unique_ptr<Expr> cond, unique_ptr<Stmt> b){
         condition = move(cond);
         body = move(b);
     }
 
-    void accept(StmtVisitor &visitor) override
-    {
+    void accept(StmtVisitor &visitor) override{
         visitor.visit_while(*this);
     }
 };
 
-struct FunDeclStmt : Stmt
-{
+struct FunDeclStmt : Stmt{
     Token name;
     vector<Token> params;
     vector<unique_ptr<Stmt>> body;
@@ -234,14 +242,12 @@ struct FunDeclStmt : Stmt
         body(move(b))
     {}
 
-    void accept(StmtVisitor &visitor) override
-    {
+    void accept(StmtVisitor &visitor) override{
         visitor.visit_fun_decl(*this);
     }
 };
 
-struct ReturnStmt : Stmt
-{
+struct ReturnStmt : Stmt{
     Token keyword;
     unique_ptr<Expr> value;
 
@@ -250,8 +256,7 @@ struct ReturnStmt : Stmt
         value(move(v))
     {}
 
-    void accept(StmtVisitor &visitor) override
-    {
+    void accept(StmtVisitor &visitor) override{
         visitor.visit_return(*this);
     }
 };

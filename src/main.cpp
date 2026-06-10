@@ -2,8 +2,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "lexer.h"
-#include "ast.h"
+// #include "lexer.h"
+// #include "ast.h"
+#include "parser.h"
 
 using namespace std;
 
@@ -35,6 +36,13 @@ int main(int argc, char* argv[]){
     for(auto i:tokens){
         i.print_token();
     }
+
+    Parser parser(tokens);
+
+    vector<unique_ptr<Stmt>> statements = parser.parse();
+
+    cout<<"Parsed Statements: "<<statements.size()<<"\n";
+
 
     return 0;
 
