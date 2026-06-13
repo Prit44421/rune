@@ -114,6 +114,9 @@ void Lexer::handle_identifier(){
     else if(s=="FALSE"){
         add_token(TokenType::FALSE, s, line);
     }
+    else if(s=="let"){
+        add_token(TokenType::LET, s, line);
+    }
     else{
         add_token(TokenType::IDENTIFIER, s, line);
     }
