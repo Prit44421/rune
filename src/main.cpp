@@ -7,6 +7,7 @@
 // #include "ast.h"
 #include "parser.h"
 #include "environment.h"
+#include "interpreter.h"
 
 using namespace std;
 
@@ -58,6 +59,8 @@ int main(int argc, char* argv[]){
     double *dptr=get_if<double>(&d);
     cout<<*dptr;
 
+    Interpreter i;
+    i.interpret(statements);
 
     return 0;
 

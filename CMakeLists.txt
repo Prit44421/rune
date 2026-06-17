@@ -8,5 +8,6 @@ add_executable(rune
     src/lexer.cpp
     src/parser.cpp
     src/environment.cpp
+    src/interpreter.cpp
 )
 target_include_directories(rune PRIVATE src/)
