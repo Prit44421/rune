@@ -33,7 +33,7 @@ void Environment::assign(Token n, Value v){
     }
     else{
         if(enclosing!=nullptr){
-            enclosing->get(n);
+            enclosing->assign(n, v);
             return ;
         }
         else{

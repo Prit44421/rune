@@ -57,8 +57,7 @@ int main(int argc, char* argv[]){
     Value d=m.get(Token(TokenType::IDENTIFIER,"x",0));
 
     double *dptr=get_if<double>(&d);
-    cout<<*dptr;
-
+    cout<<*dptr<<"\n\n";
     Interpreter i;
     i.interpret(statements);
 

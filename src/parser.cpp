@@ -47,8 +47,11 @@ Token Parser::consume(TokenType t, string mess){
 }
 
 unique_ptr<Expr> Parser::primary(){
-    if(match({TokenType::NUMBER, TokenType::STRING})){
-        return make_unique<Literal>(previous().text); 
+    if(match({TokenType::NUMBER})){
+        return make_unique<Literal>(stod(previous().text));
+    }
+    else if(match({TokenType::STRING})){
+        return make_unique<Literal>(previous().text);
     }
     else if(match({TokenType::TRUE})){
         return make_unique<Literal>(true); 
@@ -248,6 +251,51 @@ unique_ptr<Stmt> Parser::while_statement() {
 }
 
 
+unique_ptr<Stmt> Parser::for_statement(){
+
+    consume(TokenType::LEFT_PAREN_CURVE, "Expected '(' after 'for'.");
+    unique_ptr<Stmt> initializer;
+    if(match({TokenType::SEMICOLON})){
+        initializer=nullptr;
+    }
+    else if(match({TokenType::LET})){
+        initializer=var_declaration();
+    }
+    else{
+        initializer=expression_statement();
+    }
+    unique_ptr<Expr> condition;
+    if(!check(TokenType::SEMICOLON)){
+        condition=expression();
+    }
+    else{
+        condition=make_unique<Literal>(true);
+    }
+    consume(TokenType::SEMICOLON, "Expected ';' after loop condition.");
+    unique_ptr<Expr> increment;
+    if(!check(TokenType::RIGHT_PAREN_CURVE)){ //todo why not error
+        increment=expression();
+    }
+    consume(TokenType::RIGHT_PAREN_CURVE, "Expected ')' after for clauses.");
+
+    unique_ptr<Stmt> body = statement();
+    if(increment!=nullptr){
+        vector<unique_ptr<Stmt>> stmts;
+        stmts.push_back(move(body));
+        stmts.push_back(make_unique<ExprStmt>(move(increment)));
+        body=make_unique<BlockStmt>(move(stmts));
+    }
+    unique_ptr<WhileStmt> while_loop=make_unique<WhileStmt>(move(condition),move(body));
+    if(initializer!=nullptr){
+        vector<unique_ptr<Stmt>> stmts;
+        stmts.push_back(move(initializer));
+        stmts.push_back(move(while_loop));
+        return make_unique<BlockStmt>(move(stmts));
+    }
+    return while_loop;
+}
+
+
 unique_ptr<Stmt> Parser::fun_declaration() {
     Token name = consume(TokenType::IDENTIFIER, "Expected function name.");
     consume(TokenType::LEFT_PAREN_CURVE, "Expected '(' after function name.");
@@ -292,9 +340,9 @@ unique_ptr<Stmt> Parser::statement(){
     if(match({TokenType::WHILE})){
         return while_statement();
     }
-    // if(match({TokenType::FOR})){
-    //     return for_statement();
-    // }
+    if(match({TokenType::FOR})){
+        return for_statement();
+    }
     if(match({TokenType::RETURN})){
         return return_statement();
     }
@@ -325,5 +373,4 @@ vector<unique_ptr<Stmt>> Parser::parse(){
     }
     return st;
 }
-
 

@@ -23,8 +23,8 @@ private:
     void visit_print(PrintStmt &stmt);
     void visit_var_decl(VarDeclStmt &stmt);
     void visit_block(BlockStmt &stmt);
-    // void visit_if(IfStmt &stmt);
-    // void visit_while(WhileStmt &stmt);
+    void visit_if(IfStmt &stmt);
+    void visit_while(WhileStmt &stmt);
     // void visit_fun_decl(FunDeclStmt &stmt);
     // void visit_return(ReturnStmt &stmt);
     

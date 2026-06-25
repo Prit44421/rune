@@ -139,6 +139,18 @@ void Lexer::scan_token(){
         case '\n':
             line ++;
             break;
+        case '+':
+            add_token(TokenType::PLUS, "+", line);
+            break;
+        case '-':
+            add_token(TokenType::MINUS, "-", line);
+            break;
+        case '*':
+            add_token(TokenType::STAR, "*", line);
+            break;
+        case '/':
+            add_token(TokenType::SLASH, "/", line);
+            break;
         case '"':
             handle_string();
             break;

@@ -150,8 +150,8 @@ struct StmtVisitor{
     virtual void visit_print(PrintStmt &stmt) = 0;
     virtual void visit_var_decl(VarDeclStmt &stmt) = 0;
     virtual void visit_block(BlockStmt &stmt) = 0;
-    // virtual void visit_if(IfStmt &stmt) = 0;
-    // virtual void visit_while(WhileStmt &stmt) = 0;
+    virtual void visit_if(IfStmt &stmt) = 0;
+    virtual void visit_while(WhileStmt &stmt) = 0;
     // virtual void visit_fun_decl(FunDeclStmt &stmt) = 0;
     // virtual void visit_return(ReturnStmt &stmt) = 0;
 };
@@ -215,7 +215,7 @@ struct IfStmt : Stmt{
     }
 
     void accept(StmtVisitor &visitor) override{
-        // visitor.visit_if(*this);
+        visitor.visit_if(*this);
     }
 };
 
@@ -229,7 +229,7 @@ struct WhileStmt : Stmt{
     }
 
     void accept(StmtVisitor &visitor) override{
-        // visitor.visit_while(*this);
+        visitor.visit_while(*this);
     }
 };
 

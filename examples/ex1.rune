@@ -1,3 +1,18 @@
 let num = 6.98;
+num= 62;
+print("Start")
+while(num>6){
+    print("hello");
+    num=num-5;
+    print(num);
+}
 
+
+print("end");
 print(num);
+
+print("Starting for loop");
+
+for(let i=0;i<6;i=i+1){
+    print(i);
+}

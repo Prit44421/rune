@@ -136,3 +136,22 @@ void Interpreter::interpret(vector<unique_ptr<Stmt>>& stmts){
         execute(*s);
     }
 }
+
+void Interpreter::visit_if(IfStmt &e){
+    Value cond=evaluate(*e.condition);
+    if(is_true(cond)){
+        execute(*e.then_branch);
+    }
+    else{
+        if(e.else_branch!=nullptr){
+            execute(*e.else_branch);
+        }
+    }
+}
+
+void Interpreter::visit_while(WhileStmt &e){
+    while(is_true(evaluate(*e.condition))){
+        execute(*e.body);
+    }
+}
+
