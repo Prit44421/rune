@@ -117,6 +117,9 @@ void Lexer::handle_identifier(){
     else if(s=="let"){
         add_token(TokenType::LET, s, line);
     }
+    else if(s=="def"){
+        add_token(TokenType::DEF, s, line);
+    }
     else{
         add_token(TokenType::IDENTIFIER, s, line);
     }
@@ -173,6 +176,9 @@ void Lexer::scan_token(){
             break;
         case ';':
             add_token(TokenType::SEMICOLON, ";", line);
+            break;
+        case ',':
+            add_token(TokenType::COMMA, ",", line);
             break;
         case '=':
             if(match('=')){

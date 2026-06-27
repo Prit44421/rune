@@ -10,7 +10,24 @@ using namespace std;
 struct Nil{
 };
 
-using Value = variant<Nil, double, string, bool>;
+class Environment;
+struct Stmt;
+
+struct RuneFun{
+    string name;
+    vector<Token> params;
+    vector<unique_ptr<Stmt>> body;
+    shared_ptr<Environment> closure;
+
+    RuneFun(string n, vector<Token> p, vector<unique_ptr<Stmt>> b, shared_ptr<Environment> c){
+        name=n;
+        params=p;
+        body=move(b);
+        closure=c;
+    }
+};
+
+using Value = variant<Nil, double, string, bool, shared_ptr<RuneFun>>;
 
 struct Literal;
 struct BinaryExpr;
@@ -30,6 +47,7 @@ struct ExprVisitor{
     virtual Value visit_var(VarExpr &expr) = 0;
     virtual Value visit_assign(AssignExpr &expr) = 0;
     virtual Value visit_logical(LogicalExpr &expr) = 0;
+    virtual Value visit_call(CallExpr &expr) = 0;
 };
 
 struct Expr{
@@ -135,6 +153,22 @@ struct LogicalExpr : Expr{
     }
 };
 
+struct CallExpr : Expr{
+    unique_ptr<Expr> callee;
+    vector<unique_ptr<Expr>> arguments;
+    Token paren;
+
+    CallExpr(unique_ptr<Expr> c, vector<unique_ptr<Expr>> a, Token p):
+        callee(move(c)),
+        arguments(move(a)),
+        paren(p)
+    {}
+
+    Value accept(ExprVisitor &visitor) override{
+        return visitor.visit_call(*this);
+    }
+};
+
 struct ExprStmt;
 struct PrintStmt;
 struct VarDeclStmt;
@@ -152,8 +186,8 @@ struct StmtVisitor{
     virtual void visit_block(BlockStmt &stmt) = 0;
     virtual void visit_if(IfStmt &stmt) = 0;
     virtual void visit_while(WhileStmt &stmt) = 0;
-    // virtual void visit_fun_decl(FunDeclStmt &stmt) = 0;
-    // virtual void visit_return(ReturnStmt &stmt) = 0;
+    virtual void visit_fun_decl(FunDeclStmt &stmt) = 0;
+    virtual void visit_return(ReturnStmt &stmt) = 0;
 };
 
 struct Stmt{
@@ -245,7 +279,7 @@ struct FunDeclStmt : Stmt{
     {}
 
     void accept(StmtVisitor &visitor) override{
-        // visitor.visit_fun_decl(*this);
+        visitor.visit_fun_decl(*this);
     }
 };
 
@@ -259,6 +293,6 @@ struct ReturnStmt : Stmt{
     {}
 
     void accept(StmtVisitor &visitor) override{
-        // visitor.visit_return(*this);
+        visitor.visit_return(*this);
     }
 };

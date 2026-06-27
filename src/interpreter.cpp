@@ -155,3 +155,49 @@ void Interpreter::visit_while(WhileStmt &e){
     }
 }
 
+void Interpreter::visit_fun_decl(FunDeclStmt &e){
+
+    auto fun=make_shared<RuneFun>(e.name.text, e.params, move(e.body), env);
+    
+    env->define(e.name.text, fun); //todo do i need to make it shared ptr 
+    
+}
+
+Value Interpreter::visit_call(CallExpr &e){
+    Value cale=evaluate(*e.callee);
+    if(!holds_alternative<shared_ptr<RuneFun>>(cale)){
+        //todo error
+        return Nil{};
+    }
+    auto fun=get<shared_ptr<RuneFun>>(cale);
+    if(holds_alternative<shared_ptr<RuneFun>>(cale)){
+        vector<Value> args;
+        for(auto& arg:e.arguments){
+            args.push_back(evaluate(*arg));
+        }
+        if(args.size()!=fun->params.size()){
+            //todo error
+        }
+        auto call_env=make_shared<Environment>(fun->closure);
+
+        for(int i=0;i<args.size();i++){
+            call_env->define(fun->params[i].text,args[i]);
+        }
+        try{execute_block(fun->body,call_env);}
+        catch(ReturnExp &r){
+            return r.value;
+        }
+        return Nil{}; //todo error
+    }
+    return Nil{}; //todo what to return
+    
+}
+
+void Interpreter::visit_return(ReturnStmt &e){
+    Value r;
+    if(e.value!=nullptr){
+        r=evaluate(*e.value);
+    }
+    throw ReturnExp{r};
+    // todo error
+}

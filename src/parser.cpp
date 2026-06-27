@@ -79,8 +79,20 @@ unique_ptr<Expr> Parser::primary(){
 }
 
 unique_ptr<Expr> Parser::call(){
-    return primary();
-    // todo add funtion parser
+    unique_ptr<Expr> result= primary();
+    
+    while(match({TokenType::LEFT_PAREN_CURVE})){
+        vector<unique_ptr<Expr>> args;
+        if(!check(TokenType::RIGHT_PAREN_CURVE)){
+            do{
+                args.push_back(expression());
+            }while(match({TokenType::COMMA}));
+        }
+        Token paren=consume(TokenType::RIGHT_PAREN_CURVE, "Expected ')' after arguments.");
+        result=make_unique<CallExpr>(move(result),move(args),paren);
+    }
+    return result;
+
 }
 
 unique_ptr<Expr> Parser::unary(){

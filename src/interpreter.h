@@ -17,6 +17,7 @@ private:
     Value visit_var(VarExpr &expr);
     Value visit_assign(AssignExpr &expr);
     Value visit_logical(LogicalExpr &expr);
+    Value visit_call(CallExpr &expr);
 
 
     void visit_expr_stmt(ExprStmt &stmt);
@@ -25,8 +26,8 @@ private:
     void visit_block(BlockStmt &stmt);
     void visit_if(IfStmt &stmt);
     void visit_while(WhileStmt &stmt);
-    // void visit_fun_decl(FunDeclStmt &stmt);
-    // void visit_return(ReturnStmt &stmt);
+    void visit_fun_decl(FunDeclStmt &stmt);
+    void visit_return(ReturnStmt &stmt);
     
     
 public:
@@ -39,4 +40,8 @@ public:
     Interpreter(){
         env=make_shared<Environment>();
     }
+};
+
+struct ReturnExp{
+    Value value;
 };
